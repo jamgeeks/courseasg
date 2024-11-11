@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
     res.render('index', { 
         quote: randomQuote,
         imageUrl: '/images/snowboarding.jpg', // path to your image
-        repoLink: 'https://github.com/jamgeeks/courseasg.git'  // Link to your repo
+        repoLink: 'https://github.com/jamgeeks/courseasg/tree/main/workshop01'  // Link to your repo
     });
 });
 
