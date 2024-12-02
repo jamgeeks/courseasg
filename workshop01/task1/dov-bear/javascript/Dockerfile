@@ -5,6 +5,7 @@ FROM node:16
 WORKDIR /app
 
 # Copy package.json and install dependencies
+# file that changes the most is placed first for build efficiency
 COPY package*.json .
 COPY main.js .
 COPY public public
@@ -17,13 +18,18 @@ RUN npm ci
 # COPY . .
 
 # Set env variables
-ENV APP_PORT=3000
+ENV PORT=3000
 ENV INSTANCE_NAME=""
 ENV INSTANCE_HASH=""
 
+# Add health check
+# HEALTHCHECK --interval=60s --timeout=5s --start-period=5s --retries=3 \
+#   CMD curl http://localhost:${APP_PORT}/health
+
 # Expose the port
-EXPOSE ${APP_PORT}
+EXPOSE ${PORT}
 
 # Start the application
 # ENTRYPOINT node main.js ${APP_PORT}
-CMD ["node", "main.js"]
+# CMD ["node", "main.js"]
+CMD node main.js
