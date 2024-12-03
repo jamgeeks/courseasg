@@ -14,3 +14,5 @@
   `kubectl get all -nbggns -owide` -> retrieve svc port
   external IP:target port -> access application
   *if svc port is 80 do not need to append port number
+# use following to check liveness or readiness of pod
+  `kubectl describe pod_name`
