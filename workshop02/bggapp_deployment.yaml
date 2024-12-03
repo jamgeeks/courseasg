@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bggapp-deploy
+  namespace: bggns
+  labels:
+    app: bggapp-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bggapp-deploy
+  template:
+    metadata:
+      labels:
+        app: bggapp-deploy
+    spec:
+      containers:
+      - name: bgg-backend
+        image: stackupiss/bgg-backend:v1
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 300
+          periodSeconds: 60
+        envFrom:
+        - configMapRef:
+            name: bgg-cm
+        - secretRef:
+            name: bgg-secret
+        ports:
+        - containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bggapp-svc
+  namespace: bggns
+  labels:
+    app: bggapp-deploy
+spec:
+  type: ClusterIP
+  # type: NodePort
+  # type: LoadBalancer
+  selector:
+    app: bggapp-deploy
+  ports:
+  - port: 80
+    # port: 3000
+    # need to append the port to the IP but for 80 don't need
+    targetPort: 3000
