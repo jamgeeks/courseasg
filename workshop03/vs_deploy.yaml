@@ -13,6 +13,12 @@ spec:
     matchLabels:
       app: code-server
       environment: workshop
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+      # this is not very accurate -> delete first cause maxUnavailable is 1 then restart pod
   template:
     metadata:
       labels:
@@ -24,6 +30,20 @@ spec:
         image: linuxserver/code-server:amd64-4.95.3
         ports:
         - containerPort: 8443
+        resources:
+          # request minimum, request can be smaller than limits
+          requests:
+            memory: 512Mi
+            cpu: 200m
+          # maximum memory, cpu can spike but not memory
+          limits:
+            memory: 512Mi
+            cpu: 200m
+        envFrom:
+        - configMapRef:
+            name: vs-config
+        - secretRef:
+            name: vs-secret
         # env:
         # - name: TZ
         #   valueFrom:
@@ -53,21 +73,21 @@ spec:
         volumeMounts:
         - name: workspace-storage
           mountPath: /config/workspace
-        - name: config-volume
-          mountPath: /etc/code-server-config
-        - name: secret-volume
-          mountPath: /etc/code-server-secret
-          readOnly: true
+        # - name: config-volume
+        #   mountPath: /etc/code-server-config
+        # - name: secret-volume
+        #   mountPath: /etc/code-server-secret
+        #   readOnly: true
       volumes:
       - name: workspace-storage
         persistentVolumeClaim:
           claimName: vs-pvc
-      - name: config-volume
-        configMap:
-          name: vs-config
-      - name: secret-volume
-        secret:
-          secretName: vs-secret
+      # - name: config-volume
+      #   configMap:
+      #     name: vs-config
+      # - name: secret-volume
+      #   secret:
+      #     secretName: vs-secret
 ---
 apiVersion: v1
 kind: Service
