@@ -19,12 +19,11 @@ spec:
       containers:
       - name: bgg-backend
         image: stackupiss/bgg-backend:v1
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 300
-          timeoutSeconds: 5
-          failureThreshold: 1
+        # readinessProbe:
+        #   httpGet:
+        #     path: /healthz
+        #     port: 300
+        #   timeoutSeconds: 5
         livenessProbe:
           httpGet:
             path: /healthz

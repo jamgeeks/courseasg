@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vsns
+  labels:
+    app: code-server
+    environment: workshop
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vs-config
+  namespace: vsns
+  labels:
+    app: code-server
+    environment: workshop
+data:
+  TZ: Asia/Singapore
+  DEFAULT_WORKSPACE: /config/workspace
+  PROXY_DOMAIN: code-167.172.6.65.nip.io
+  
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vs-secret
+  namespace: vsns
+  labels:
+    app: code-server
+    environment: workshop
+data:
+  PASSWORD: cGFzc3dvcmQ=
+  SUDO_PASSWORD: cGFzc3dvcmQ=

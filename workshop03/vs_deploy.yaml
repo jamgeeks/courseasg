@@ -1,0 +1,109 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-server
+  namespace: vsns
+  labels:
+    app: code-server
+    environment: workshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: code-server
+      environment: workshop
+  template:
+    metadata:
+      labels:
+        app: code-server
+        environment: workshop
+    spec:
+      containers:
+      - name: code-server
+        image: linuxserver/code-server:amd64-4.95.3
+        ports:
+        - containerPort: 8443
+        # env:
+        # - name: TZ
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: vs-config
+        #       key: TZ
+        # - name: DEFAULT_WORKSPACE
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: vs-config
+        #       key: DEFAULT_WORKSPACE
+        # - name: PROXY_DOMAIN
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: vs-config
+        #       key: PROXY_DOMAIN
+        # - name: PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: vs-secret
+        #       key: PASSWORD
+        # - name: SUDO_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: vs-secret
+        #       key: SUDO_PASSWORD
+        volumeMounts:
+        - name: workspace-storage
+          mountPath: /config/workspace
+        - name: config-volume
+          mountPath: /etc/code-server-config
+        - name: secret-volume
+          mountPath: /etc/code-server-secret
+          readOnly: true
+      volumes:
+      - name: workspace-storage
+        persistentVolumeClaim:
+          claimName: vs-pvc
+      - name: config-volume
+        configMap:
+          name: vs-config
+      - name: secret-volume
+        secret:
+          secretName: vs-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: code-server-svc
+  namespace: vsns
+  labels:
+    app: code-server
+    environment: workshop
+spec:
+  type: ClusterIP
+  selector:
+    app: code-server
+    environment: workshop
+  ports:
+  - port: 8443
+    targetPort: 8443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: code-server-ingress
+  namespace: vsns
+  labels:
+    app: code-server
+    environment: workshop
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: code-167.172.6.65.nip.io 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: code-server-svc
+            port:
+              number: 8443
