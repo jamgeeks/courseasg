@@ -122,6 +122,7 @@ spec:
       paths:
       - path: /
         pathType: Prefix
+        # other options include exact, implementationSpecific (ingresss controller will decide)
         backend:
           service:
             name: code-server-svc
